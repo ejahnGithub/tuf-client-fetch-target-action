@@ -1,8 +1,8 @@
-name: 'TUF Client Fetch Target'
+name: 'TUF Client Fetch Target Action'
 description: 'This is a Github Action to test the tuf-js client'
 inputs:
-  target-file:
-    description: 'the taget file to fetch'
+  target-files:
+    description: 'one or multiple taget files to fetch'
     required: true
   root-metadata-url:
     description: 'the first version of root metadata'

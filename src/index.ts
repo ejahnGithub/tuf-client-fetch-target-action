@@ -25,7 +25,7 @@ async function initDir(
 }
 
 async function downloadTarget(
-  targetFile: string,
+  targetFiles: string[],
   metadataBaseUrl: string,
   targetBaseUrl: string,
   metadataDir: string,
@@ -38,24 +38,27 @@ async function downloadTarget(
     targetBaseUrl,
   });
   await updater.refresh();
-  const targetInfo = await updater.getTargetInfo(targetFile);
 
-  if (!targetInfo) {
-    console.log(`Target ${targetFile} doesn't exist`);
-    return;
-  }
-  const targetPath = await updater.findCachedTarget(targetInfo);
-  if (targetPath) {
-    console.log(`Target ${targetFile} is cached at ${targetPath}`);
-    return;
-  }
+  for (const targetFile of targetFiles) {
+    const targetInfo = await updater.getTargetInfo(targetFile);
 
-  const downloadedTargetPath = await updater.downloadTarget(targetInfo);
-  console.log(`Target ${targetFile} downloaded to ${downloadedTargetPath}`);
+    if (!targetInfo) {
+      console.log(`Target ${targetFile} doesn't exist`);
+      return;
+    }
+    const targetPath = await updater.findCachedTarget(targetInfo);
+    if (targetPath) {
+      console.log(`Target ${targetFile} is cached at ${targetPath}`);
+      return;
+    }
+
+    const downloadedTargetPath = await updater.downloadTarget(targetInfo);
+    console.log(`Target ${targetFile} downloaded to ${downloadedTargetPath}`);
+  }
 }
 
 async function run() {
-  const targetFile = core.getInput('target-file');
+  const rawTargetFiles = core.getInput('target-files');
   const metadataBaseUrl = core.getInput('metadata-base-url');
   const targetBaseUrl = core.getInput('target-base-url');
   const rootMetadataUrl = core.getInput('root-metadata-url');
@@ -63,9 +66,11 @@ async function run() {
   const metadataDir = './metadata';
   const targetDir = './targets';
 
+  const targetFiles = rawTargetFiles.split(',');
+
   await initDir(rootMetadataUrl, metadataDir, targetDir);
   await downloadTarget(
-    targetFile,
+    targetFiles,
     metadataBaseUrl,
     targetBaseUrl,
     metadataDir,
