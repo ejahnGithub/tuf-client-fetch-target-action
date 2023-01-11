@@ -28,17 +28,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
 const fs_1 = __importDefault(require("fs"));
+const make_fetch_happen_1 = __importDefault(require("make-fetch-happen"));
 const path_1 = __importDefault(require("path"));
 const tuf_js_1 = require("tuf-js");
 const metadataDir = './metadata';
 const targetDir = './targets';
-const rootFile = './1.root.json';
-function initDir() {
+async function initDir(rootMetadataUrl) {
     if (!fs_1.default.existsSync(metadataDir)) {
         fs_1.default.mkdirSync(metadataDir);
     }
     if (!fs_1.default.existsSync(path_1.default.join(metadataDir, 'root.json'))) {
-        fs_1.default.copyFileSync(rootFile, path_1.default.join(metadataDir, 'root.json'));
+        // install 1.root.json
+        const data = await (await (0, make_fetch_happen_1.default)(rootMetadataUrl)).json();
+        fs_1.default.writeFileSync(path_1.default.join(metadataDir, 'root.json'), JSON.stringify(data));
     }
     if (!fs_1.default.existsSync(targetDir)) {
         fs_1.default.mkdirSync(targetDir);
@@ -65,12 +67,16 @@ async function downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl) {
     const downloadedTargetPath = await updater.downloadTarget(targetInfo);
     console.log(`Target ${targetFile} downloaded to ${downloadedTargetPath}`);
 }
-try {
+async function run() {
     const targetFile = core.getInput('targetFile');
     const metadataBaseUrl = core.getInput('metadataBaseUrl');
     const targetBaseUrl = core.getInput('targetBaseUrl');
-    initDir();
-    downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl);
+    const rootMetadataUrl = core.getInput('rootMetadataUrl');
+    await initDir(rootMetadataUrl);
+    await downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl);
+}
+try {
+    run();
 }
 catch (err) {
     core.setFailed(`Action failed with error ${err}`);
