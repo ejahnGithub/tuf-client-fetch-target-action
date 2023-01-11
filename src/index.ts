@@ -4,10 +4,11 @@ import fetch from 'make-fetch-happen';
 import path from 'path';
 import { Updater } from 'tuf-js';
 
-const metadataDir = './metadata';
-const targetDir = './targets';
-
-async function initDir(rootMetadataUrl: string) {
+async function initDir(
+  rootMetadataUrl: string,
+  metadataDir: string,
+  targetDir: string
+) {
   if (!fs.existsSync(metadataDir)) {
     fs.mkdirSync(metadataDir);
   }
@@ -26,7 +27,9 @@ async function initDir(rootMetadataUrl: string) {
 async function downloadTarget(
   targetFile: string,
   metadataBaseUrl: string,
-  targetBaseUrl: string
+  targetBaseUrl: string,
+  metadataDir: string,
+  targetDir: string
 ) {
   const updater = new Updater({
     metadataBaseUrl,
@@ -52,13 +55,22 @@ async function downloadTarget(
 }
 
 async function run() {
-  const targetFile = core.getInput('targetFile');
-  const metadataBaseUrl = core.getInput('metadataBaseUrl');
-  const targetBaseUrl = core.getInput('targetBaseUrl');
-  const rootMetadataUrl = core.getInput('rootMetadataUrl');
+  const targetFile = core.getInput('target-file');
+  const metadataBaseUrl = core.getInput('metadata-base-url');
+  const targetBaseUrl = core.getInput('target-base-url');
+  const rootMetadataUrl = core.getInput('root-metadata-url');
 
-  await initDir(rootMetadataUrl);
-  await downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl);
+  const metadataDir = './metadata';
+  const targetDir = './targets';
+
+  await initDir(rootMetadataUrl, metadataDir, targetDir);
+  await downloadTarget(
+    targetFile,
+    metadataBaseUrl,
+    targetBaseUrl,
+    metadataDir,
+    targetDir
+  );
 }
 
 try {

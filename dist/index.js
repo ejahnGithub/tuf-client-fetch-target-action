@@ -31,9 +31,7 @@ const fs_1 = __importDefault(require("fs"));
 const make_fetch_happen_1 = __importDefault(require("make-fetch-happen"));
 const path_1 = __importDefault(require("path"));
 const tuf_js_1 = require("tuf-js");
-const metadataDir = './metadata';
-const targetDir = './targets';
-async function initDir(rootMetadataUrl) {
+async function initDir(rootMetadataUrl, metadataDir, targetDir) {
     if (!fs_1.default.existsSync(metadataDir)) {
         fs_1.default.mkdirSync(metadataDir);
     }
@@ -46,7 +44,7 @@ async function initDir(rootMetadataUrl) {
         fs_1.default.mkdirSync(targetDir);
     }
 }
-async function downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl) {
+async function downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl, metadataDir, targetDir) {
     const updater = new tuf_js_1.Updater({
         metadataBaseUrl,
         metadataDir,
@@ -68,12 +66,14 @@ async function downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl) {
     console.log(`Target ${targetFile} downloaded to ${downloadedTargetPath}`);
 }
 async function run() {
-    const targetFile = core.getInput('targetFile');
-    const metadataBaseUrl = core.getInput('metadataBaseUrl');
-    const targetBaseUrl = core.getInput('targetBaseUrl');
-    const rootMetadataUrl = core.getInput('rootMetadataUrl');
-    await initDir(rootMetadataUrl);
-    await downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl);
+    const targetFile = core.getInput('target-file');
+    const metadataBaseUrl = core.getInput('metadata-base-url');
+    const targetBaseUrl = core.getInput('target-base-url');
+    const rootMetadataUrl = core.getInput('root-metadata-url');
+    const metadataDir = './metadata';
+    const targetDir = './targets';
+    await initDir(rootMetadataUrl, metadataDir, targetDir);
+    await downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl, metadataDir, targetDir);
 }
 try {
     run();

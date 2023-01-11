@@ -1,22 +1,18 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'TUF Client Fetch Target'
+description: 'This is a Github Action to test the tuf-js client'
 inputs:
-  targetFile: # id of input
-    description: 'Who to greet'
+  target-file:
+    description: 'the taget file to fetch'
     required: true
-    default: 'ctfe.pub'
-  targetBaseUrl: # id of input
-    description: 'Who to greet'
+  root-metadata-url:
+    description: 'the first version of root metadata'
     required: true
-    default: 'https://sigstore-tuf-root.storage.googleapis.com/targets'
-  metadataBaseUrl: # id of input
-    description: 'Who to greet'
+  metadata-base-url:
+    description: 'the base url which contains all metadata'
     required: true
-    default: 'https://sigstore-tuf-root.storage.googleapis.com'
-  rootMetadataUrl:
-    description: 'Who to greet'
+  target-base-url:
+    description: 'the base url which contains the target file to fetch'
     required: true
-    default: 'https://sigstore-tuf-root.storage.googleapis.com/1.root.json'
 runs:
   using: 'node16'
   main: 'dist/index.js'
