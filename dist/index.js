@@ -44,7 +44,7 @@ async function initDir(rootMetadataUrl, metadataDir, targetDir) {
         fs_1.default.mkdirSync(targetDir);
     }
 }
-async function downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl, metadataDir, targetDir) {
+async function downloadTarget(targetFiles, metadataBaseUrl, targetBaseUrl, metadataDir, targetDir) {
     const updater = new tuf_js_1.Updater({
         metadataBaseUrl,
         metadataDir,
@@ -52,28 +52,31 @@ async function downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl, metada
         targetBaseUrl,
     });
     await updater.refresh();
-    const targetInfo = await updater.getTargetInfo(targetFile);
-    if (!targetInfo) {
-        console.log(`Target ${targetFile} doesn't exist`);
-        return;
+    for (const targetFile of targetFiles) {
+        const targetInfo = await updater.getTargetInfo(targetFile);
+        if (!targetInfo) {
+            console.log(`Target ${targetFile} doesn't exist`);
+            return;
+        }
+        const targetPath = await updater.findCachedTarget(targetInfo);
+        if (targetPath) {
+            console.log(`Target ${targetFile} is cached at ${targetPath}`);
+            return;
+        }
+        const downloadedTargetPath = await updater.downloadTarget(targetInfo);
+        console.log(`Target ${targetFile} downloaded to ${downloadedTargetPath}`);
     }
-    const targetPath = await updater.findCachedTarget(targetInfo);
-    if (targetPath) {
-        console.log(`Target ${targetFile} is cached at ${targetPath}`);
-        return;
-    }
-    const downloadedTargetPath = await updater.downloadTarget(targetInfo);
-    console.log(`Target ${targetFile} downloaded to ${downloadedTargetPath}`);
 }
 async function run() {
-    const targetFile = core.getInput('target-file');
+    const rawTargetFiles = core.getInput('target-files');
     const metadataBaseUrl = core.getInput('metadata-base-url');
     const targetBaseUrl = core.getInput('target-base-url');
     const rootMetadataUrl = core.getInput('root-metadata-url');
     const metadataDir = './metadata';
     const targetDir = './targets';
+    const targetFiles = rawTargetFiles.split(',');
     await initDir(rootMetadataUrl, metadataDir, targetDir);
-    await downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl, metadataDir, targetDir);
+    await downloadTarget(targetFiles, metadataBaseUrl, targetBaseUrl, metadataDir, targetDir);
 }
 try {
     run();
