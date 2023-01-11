@@ -8,11 +8,11 @@ inputs:
   targetBaseUrl: # id of input
     description: 'Who to greet'
     required: true
-    default: 'https://sigstore-tuf-root.storage.googleapis.com'
+    default: 'https://sigstore-tuf-root.storage.googleapis.com/targets'
   metadataBaseUrl: # id of input
     description: 'Who to greet'
     required: true
-    default: 'https://sigstore-tuf-root.storage.googleapis.com/targets'
+    default: 'https://sigstore-tuf-root.storage.googleapis.com'
   rootMetadataUrl:
     description: 'Who to greet'
     required: true
