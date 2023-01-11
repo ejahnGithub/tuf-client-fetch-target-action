@@ -1,1 +1,1 @@
-# tuf-client-fetch-target
+# tuf-client-fetch-target-action
