@@ -1,19 +1,21 @@
 import * as core from '@actions/core';
 import fs from 'fs';
+import fetch from 'make-fetch-happen';
 import path from 'path';
 import { Updater } from 'tuf-js';
 
 const metadataDir = './metadata';
 const targetDir = './targets';
-const rootFile = './1.root.json';
 
-function initDir() {
+async function initDir(rootMetadataUrl: string) {
   if (!fs.existsSync(metadataDir)) {
     fs.mkdirSync(metadataDir);
   }
 
   if (!fs.existsSync(path.join(metadataDir, 'root.json'))) {
-    fs.copyFileSync(rootFile, path.join(metadataDir, 'root.json'));
+    // install 1.root.json
+    const data = await (await fetch(rootMetadataUrl)).json();
+    fs.writeFileSync(path.join(metadataDir, 'root.json'), JSON.stringify(data));
   }
 
   if (!fs.existsSync(targetDir)) {
@@ -49,13 +51,18 @@ async function downloadTarget(
   console.log(`Target ${targetFile} downloaded to ${downloadedTargetPath}`);
 }
 
-try {
+async function run() {
   const targetFile = core.getInput('targetFile');
   const metadataBaseUrl = core.getInput('metadataBaseUrl');
   const targetBaseUrl = core.getInput('targetBaseUrl');
+  const rootMetadataUrl = core.getInput('rootMetadataUrl');
 
-  initDir();
-  downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl);
+  await initDir(rootMetadataUrl);
+  await downloadTarget(targetFile, metadataBaseUrl, targetBaseUrl);
+}
+
+try {
+  run();
 } catch (err) {
   core.setFailed(`Action failed with error ${err}`);
 }

@@ -13,6 +13,10 @@ inputs:
     description: 'Who to greet'
     required: true
     default: 'https://sigstore-tuf-root.storage.googleapis.com/targets'
+  rootMetadataUrl:
+    description: 'Who to greet'
+    required: true
+    default: 'https://sigstore-tuf-root.storage.googleapis.com/1.root.json'
 runs:
   using: 'node16'
   main: 'dist/index.js'
