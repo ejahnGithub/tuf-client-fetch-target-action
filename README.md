@@ -2,9 +2,9 @@
 
 ## About
 
-This is a github action for testing TUF-JS client to fetch the targets from TUF repo
+This is a github action for testing TUF-JS client to fetch the targets from TUF repository
 
-## input:
+## Inputs:
 
 - target-files: one or multiple taget files to fetch
 - root-metadata-url: the first version of root metadata
